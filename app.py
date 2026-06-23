@@ -15,7 +15,7 @@ from utils.visualizer import Visualizer
 from utils.db import Database
 
 app = Flask(__name__)
-app.secret_key = "insightforge_secret_2024_v3"
+app.secret_key = os.environ.get("SECRET_KEY", "insightforge_secret_2024_v3")
 
 UPLOAD_FOLDER = os.path.join("static", "uploads")
 PLOT_FOLDER   = os.path.join("static", "plots")
@@ -344,6 +344,9 @@ def server_error(e):
     return render_template("error.html", message="Internal server error."), 500
 
 
+# Ensure DB tables exist whether run via `python app.py` or via Gunicorn
+db.init_db()
+
 if __name__ == "__main__":
-    db.init_db()
-    app.run(host="127.0.0.1", port=5050, debug=True, use_reloader=False)
+    port = int(os.environ.get("PORT", 5050))
+    app.run(host="0.0.0.0", port=port, debug=True, use_reloader=False)

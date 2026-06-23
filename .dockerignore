@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.db
+.git/
+.gitignore
+static/uploads/*
+static/plots/*
+!static/uploads/.gitkeep
+!static/plots/.gitkeep
+.env
+*.egg-info/
+.DS_Store
+README.md

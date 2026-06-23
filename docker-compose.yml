@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  insightforge:
+    build: .
+    image: insightforge:latest
+    container_name: insightforge_app
+    ports:
+      - "5050:5050"
+    environment:
+      - PORT=5050
+    volumes:
+      - ./static/uploads:/app/static/uploads
+      - ./static/plots:/app/static/plots
+      - insightforge_db:/app/data
+    restart: unless-stopped
+
+volumes:
+  insightforge_db:
