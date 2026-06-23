@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% block title %}{{ filename }} – InsightForge{% endblock %}
+{% block page_title %}Analysing: {{ filename }}{% endblock %}
+
+{% block content %}
+
+<div class="grid-3" style="margin-bottom:20px">
+  <div class="stat-card">
+    <div class="stat-label">Rows</div>
+    <div class="stat-value">{{ "{:,}".format(shape[0]) }}</div>
+    <div class="stat-sub">Records loaded</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Columns</div>
+    <div class="stat-value">{{ shape[1] }}</div>
+    <div class="stat-sub">Features detected</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Missing Values</div>
+    <div class="stat-value" style="color:{% if missing %}var(--amber){% else %}var(--teal){% endif %}">{{ missing|length }}</div>
+    <div class="stat-sub">Columns affected</div>
+  </div>
+</div>
+
+<div class="grid-2">
+
+<!-- LEFT COLUMN -->
+<div>
+
+  <!-- AUTO INSIGHTS -->
+  {% if insights %}
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><i class="fa fa-sparkles"></i> Auto-Generated Insights</div>
+    </div>
+    {% for ins in insights %}
+    <div class="insight-item">
+      <div class="insight-icon insight-{{ ins.tone }}"><i class="fa {{ ins.icon }}"></i></div>
+      <div class="insight-text">{{ ins.text }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><i class="fa fa-table"></i> Dataset Preview</div>
+      <span class="badge badge-violet">First 8 rows</span>
+    </div>
+    <div class="table-wrap">{{ preview | safe }}</div>
+  </div>
+
+  {% if missing %}
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><i class="fa fa-triangle-exclamation" style="color:var(--amber)"></i> Missing Values</div>
+    </div>
+    {% for col, cnt in missing.items() %}
+    <span class="missing-badge"><i class="fa fa-circle-minus"></i> {{ col }}: {{ cnt }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><i class="fa fa-calculator"></i> Descriptive Statistics</div>
+    </div>
+    <div class="table-wrap">{{ stats_html | safe }}</div>
+  </div>
+
+</div><!-- end left -->
+
+<!-- RIGHT COLUMN -->
+<div>
+
+  <!-- MODEL BUILDER -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><i class="fa fa-brain"></i> ML Model Builder</div>
+    </div>
+
+    <form id="trainForm">
+      <input type="hidden" name="filepath" value="{{ filepath }}" />
+      <input type="hidden" name="project_id" value="{{ project_id }}" />
+
+      <div class="form-group">
+        <label class="form-label">Target Column (what to predict)</label>
+        <select class="form-control" name="target" id="targetSelect">
+          {% for col in columns %}
+          <option value="{{ col }}">{{ col }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Feature Columns (inputs to model)</label>
+        <div class="checkbox-grid" id="featureGrid">
+          {% for col in columns %}
+          <label class="check-item" data-col="{{ col }}">
+            <input type="checkbox" name="features" value="{{ col }}" checked />
+            <span class="check-name">{{ col }}</span>
+            {% set ctype = col_types.get(col, 'text') %}
+            <span class="type-pill type-{{ ctype }}">{{ ctype[:3] }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" type="submit" id="trainBtn">
+        <i class="fa fa-rocket"></i> Train & Compare Models
+      </button>
+    </form>
+  </div>
+
+  <!-- LOADING STATE -->
+  <div class="card inline-loader" id="trainLoader">
+    <div class="spinner-sm"></div>
+    <span>Training Gradient Boosting, Random Forest & baseline model…</span>
+  </div>
+
+  <!-- ERROR STATE -->
+  <div class="card" id="trainError" style="display:none;border-color:rgba(240,86,122,.35)">
+    <div class="card-title" style="color:var(--rose)"><i class="fa fa-circle-exclamation"></i> Training Failed</div>
+    <p id="trainErrorMsg" style="font-size:13px;color:var(--text-dim);margin-top:10px"></p>
+  </div>
+
+  <!-- RESULTS (populated by JS) -->
+  <div id="resultsContainer"></div>
+
+</div><!-- end right -->
+
+</div><!-- end grid-2 -->
+
+<!-- CHARTS (full width, populated by JS) -->
+<div id="chartsContainer"></div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const featureGrid  = document.getElementById('featureGrid')
+const targetSelect = document.getElementById('targetSelect')
+
+function syncFeatureLocks(){
+  const target = targetSelect.value
+  featureGrid.querySelectorAll('.check-item').forEach(item => {
+    const cb = item.querySelector('input')
+    if(item.dataset.col === target){
+      cb.checked = false
+      cb.disabled = true
+      item.classList.add('target-selected')
+      item.style.opacity = '.45'
+    } else {
+      cb.disabled = false
+      item.classList.remove('target-selected')
+      item.style.opacity = '1'
+    }
+  })
+}
+targetSelect.addEventListener('change', syncFeatureLocks)
+syncFeatureLocks()
+
+const TYPE_COLORS = {numeric:'var(--violet)', categorical:'var(--teal)', text:'var(--amber)', datetime:'var(--rose)'}
+
+document.getElementById('trainForm').addEventListener('submit', async function(e){
+  e.preventDefault()
+
+  const btn = document.getElementById('trainBtn')
+  const loader = document.getElementById('trainLoader')
+  const errBox = document.getElementById('trainError')
+  const resultsBox = document.getElementById('resultsContainer')
+  const chartsBox = document.getElementById('chartsContainer')
+
+  const checked = featureGrid.querySelectorAll('input[type=checkbox]:checked')
+  if(checked.length === 0){
+    showToast('Select at least one feature column.', 'error')
+    return
+  }
+
+  btn.disabled = true
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Training…'
+  loader.classList.add('show')
+  errBox.style.display = 'none'
+  resultsBox.innerHTML = ''
+  chartsBox.innerHTML = ''
+
+  try{
+    const formData = new FormData(this)
+    const res = await fetch('/train', { method:'POST', body: formData })
+    const data = await res.json()
+
+    if(!res.ok || data.error){
+      throw new Error(data.error || 'Unknown error during training.')
+    }
+
+    renderResults(data)
+    renderCharts(data)
+    showToast('Model trained successfully — ' + data.accuracy + '% ' + data.metric, 'success')
+
+  } catch(err){
+    document.getElementById('trainErrorMsg').textContent = err.message
+    errBox.style.display = 'block'
+    showToast('Training failed. See details below.', 'error')
+  } finally {
+    loader.classList.remove('show')
+    btn.disabled = false
+    btn.innerHTML = '<i class="fa fa-rocket"></i> Train & Compare Models'
+  }
+})
+
+function renderResults(data){
+  const resultsBox = document.getElementById('resultsContainer')
+
+  let metricsHtml = ''
+  if(data.extra_metrics){
+    const entries = Object.entries(data.extra_metrics).filter(([k,v]) => v !== null && v !== undefined)
+    if(entries.length){
+      metricsHtml = '<div class="metric-chips">' + entries.map(([k,v]) =>
+        `<div class="metric-chip"><div class="metric-chip-label">${k}</div><div class="metric-chip-value">${v}</div></div>`
+      ).join('') + '</div>'
+    }
+  }
+
+  let compareHtml = ''
+  if(data.all_scores && data.all_scores.length > 1){
+    const maxScore = Math.max(...data.all_scores.map(s => s.score))
+    compareHtml = '<div class="card-header" style="margin-top:18px"><div class="card-title" style="font-size:13px"><i class="fa fa-layer-group"></i> Model Comparison</div></div>' +
+      data.all_scores.map((s, i) => {
+        const pct = maxScore > 0 ? (s.score / maxScore * 100) : 0
+        const color = i === 0 ? 'linear-gradient(90deg,var(--violet),var(--teal))' : 'var(--border)'
+        return `<div class="compare-row">
+          <div class="compare-label"><span>${s.model}${i===0 ? ' <span class="pill pill-violet">BEST</span>' : ''}</span><span class="mono">${s.score}%</span></div>
+          <div class="compare-track"><div class="compare-fill" style="width:${pct}%;background:${color}"></div></div>
+        </div>`
+      }).join('')
+  }
+
+  let featImpHtml = ''
+  if(data.feature_importance && data.feature_importance.length){
+    const maxImp = data.feature_importance[0].importance || 1
+    featImpHtml = `<div class="card">
+      <div class="card-header"><div class="card-title"><i class="fa fa-ranking-star"></i> Feature Importance</div></div>
+      ${data.feature_importance.slice(0,10).map(item => `
+        <div style="margin-bottom:9px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+            <span style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%">${item.feature}</span>
+            <span class="mono text-muted">${(item.importance*100).toFixed(1)}%</span>
+          </div>
+          <div style="height:6px;background:var(--surface);border-radius:3px">
+            <div style="height:6px;border-radius:3px;width:${(item.importance/maxImp*100).toFixed(0)}%;background:linear-gradient(90deg,var(--violet),var(--teal))"></div>
+          </div>
+        </div>`).join('')}
+    </div>`
+  }
+
+  resultsBox.innerHTML = `
+    <div class="card" style="border-color:rgba(124,108,245,.3)">
+      <div class="card-header">
+        <div class="card-title"><i class="fa fa-trophy" style="color:var(--amber)"></i> Model Results</div>
+        <span class="badge badge-teal"><i class="fa fa-check"></i> Trained</span>
+      </div>
+      <div class="score-wrap">
+        <div class="score-big">${data.accuracy}%</div>
+        <div class="score-metric">${data.metric}</div>
+        <div class="score-model"><i class="fa fa-microchip"></i> ${data.model_type}</div>
+      </div>
+      ${metricsHtml}
+      ${compareHtml}
+    </div>
+    ${featImpHtml}
+    <div style="padding:6px 0 12px">
+      <a href="/download/{{ project_id }}" class="btn btn-ghost btn-full"><i class="fa fa-download"></i> Download Results (JSON)</a>
+    </div>
+  `
+}
+
+function renderCharts(data){
+  const chartsBox = document.getElementById('chartsContainer')
+  const allCharts = [...(data.plot_urls || [])]
+  if(data.conf_url) allCharts.push({title:'Confusion Matrix', url:data.conf_url})
+  if(data.shap_url) allCharts.push({title:'SHAP Feature Impact (Explainable AI)', url:data.shap_url})
+
+  if(allCharts.length === 0) return
+
+  chartsBox.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="fa fa-chart-column"></i> Auto-Generated Visualizations</div>
+        <span class="badge badge-violet">${allCharts.length} charts</span>
+      </div>
+      <div class="chart-grid">
+        ${allCharts.map(c => `
+          <div class="chart-card">
+            <div class="chart-title">${c.title}</div>
+            <img src="${c.url}" alt="${c.title}" loading="lazy" />
+          </div>`).join('')}
+      </div>
+    </div>
+  `
+}
+</script>
+{% endblock %}

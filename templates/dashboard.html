@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – InsightForge{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="grid-3" style="margin-bottom:22px">
+  <div class="stat-card">
+    <div class="stat-label">Datasets Analysed</div>
+    <div class="stat-value text-violet">{{ stats.projects }}</div>
+    <div class="stat-sub">Total projects</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Model Runs</div>
+    <div class="stat-value text-teal">{{ stats.runs }}</div>
+    <div class="stat-sub">Across all projects</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Best Score Achieved</div>
+    <div class="stat-value" style="color:var(--amber)">{{ stats.best_score }}%</div>
+    <div class="stat-sub">Top accuracy / R² so far</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><i class="fa fa-upload"></i> Upload New Dataset</div>
+    </div>
+    <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon"><i class="fa fa-cloud-arrow-up"></i></div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:6px">Drop your file here</div>
+        <div class="drop-hint">CSV or Excel (.csv, .xlsx, .xls) — click or drag</div>
+      </div>
+      <input type="file" id="fileInput" name="file" accept=".csv,.xlsx,.xls" style="display:none" required />
+      <button class="btn btn-primary btn-full" style="margin-top:14px" type="submit" id="uploadBtn">
+        <i class="fa fa-bolt"></i> Analyse Dataset
+      </button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><i class="fa fa-folder-open"></i> Recent Projects</div>
+      <a href="/history" class="btn btn-ghost btn-sm">View All</a>
+    </div>
+
+    {% if projects %}
+      {% for proj in projects[:6] %}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border-soft)">
+        <div>
+          <div style="font-size:13px;font-weight:600">{{ proj.name }}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono)">
+            {{ proj.run_count }} run{{ 's' if proj.run_count != 1 else '' }}
+            {% if proj.best_score %} · best {{ proj.best_score|round(1) }}%{% endif %}
+          </div>
+        </div>
+        <a href="/project/{{ proj.id }}" class="btn btn-ghost btn-sm"><i class="fa fa-arrow-right"></i></a>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="text-align:center;padding:36px;color:var(--muted)">
+        <div style="font-size:28px;margin-bottom:10px">📂</div>
+        <div style="font-size:14px">No projects yet. Upload your first dataset.</div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="card-title"><i class="fa fa-lightbulb"></i> How InsightForge Works</div>
+  </div>
+  <div class="grid-3">
+    <div style="padding:18px;background:var(--surface);border-radius:11px;text-align:center;border:1px solid var(--border-soft)">
+      <div style="font-size:24px;margin-bottom:9px">1️⃣</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:6px">Upload Dataset</div>
+      <div style="font-size:12px;color:var(--muted)">CSV or Excel. Auto-profiled with insights in seconds.</div>
+    </div>
+    <div style="padding:18px;background:var(--surface);border-radius:11px;text-align:center;border:1px solid var(--border-soft)">
+      <div style="font-size:24px;margin-bottom:9px">2️⃣</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:6px">Select Target & Features</div>
+      <div style="font-size:12px;color:var(--muted)">Pick what to predict — InsightForge compares 3 models for you.</div>
+    </div>
+    <div style="padding:18px;background:var(--surface);border-radius:11px;text-align:center;border:1px solid var(--border-soft)">
+      <div style="font-size:24px;margin-bottom:9px">3️⃣</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:6px">Get Results Instantly</div>
+      <div style="font-size:12px;color:var(--muted)">Live scores, SHAP explainability, and 4 charts — no reload.</div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('uploadForm').addEventListener('submit', function(){
+  const btn = document.getElementById('uploadBtn')
+  btn.disabled = true
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Analysing…'
+})
+</script>
+{% endblock %}

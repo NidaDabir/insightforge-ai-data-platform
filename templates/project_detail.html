@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{ project.name }} – InsightForge{% endblock %}
+{% block page_title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+
+<div style="display:flex;gap:12px;margin-bottom:20px">
+  <a href="/history" class="btn btn-ghost btn-sm"><i class="fa fa-arrow-left"></i> Back</a>
+  <a href="/download/{{ project.id }}" class="btn btn-ghost btn-sm"><i class="fa fa-download"></i> Download</a>
+  <form action="/project/{{ project.id }}/delete" method="POST" onsubmit="return confirm('Delete this project permanently?')">
+    <button class="btn btn-danger btn-sm" type="submit"><i class="fa fa-trash"></i> Delete</button>
+  </form>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header"><div class="card-title"><i class="fa fa-database"></i> Project Info</div></div>
+    <table>
+      <tr><td style="color:var(--muted);width:120px">Name</td><td>{{ project.name }}</td></tr>
+      <tr><td style="color:var(--muted)">Shape</td><td class="mono">{{ project.shape }}</td></tr>
+      <tr><td style="color:var(--muted)">Model Runs</td><td><span class="badge badge-violet">{{ runs|length }}</span></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title"><i class="fa fa-chart-line"></i> Model Run History</div></div>
+
+    {% if runs %}
+    {% for run in runs %}
+    <div style="padding:13px;background:var(--surface);border-radius:10px;margin-bottom:10px;border:1px solid var(--border-soft)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:12.5px;font-weight:600">{{ run.model_type }}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">Target: <span class="text-teal">{{ run.target }}</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">
+            Features:
+            {% if run.features is string %}{{ run.features }}
+            {% else %}
+              {% for f in run.features[:4] %}{{ f }}{% if not loop.last %}, {% endif %}{% endfor %}
+              {% if run.features|length > 4 %}+{{ run.features|length - 4 }} more{% endif %}
+            {% endif %}
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--violet)">{{ run.score }}%</div>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono)">{{ run.metric }}</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div style="text-align:center;padding:32px;color:var(--muted)">No model runs yet for this project.</div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

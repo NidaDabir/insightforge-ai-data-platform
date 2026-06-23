@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sign Up – InsightForge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{--bg:#0b1220;--surface:#0e1726;--card:#131d33;--border:#1f2b45;
+      --violet:#7c6cf5;--violet-dim:#5b4fd1;--teal:#34d9c5;--text:#e7ecf5;--muted:#6b7894;--rose:#f0567a}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
+     min-height:100vh;display:grid;place-items:center;padding:24px}
+body::before{content:'';position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(ellipse 60% 40% at 80% 0%, rgba(124,108,245,.13) 0%, transparent 60%)}
+.auth-card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:38px}
+.auth-brand{text-align:center;margin-bottom:28px}
+.brand-mark{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--violet),var(--teal));
+            display:grid;place-items:center;margin:0 auto 14px}
+.brand-mark svg{width:24px;height:24px}
+.auth-brand h2{font-family:'Sora',sans-serif;font-size:22px;font-weight:700}
+.auth-brand p{font-size:13px;color:var(--muted);margin-top:5px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:7px}
+.form-control{width:100%;padding:11px 14px;background:var(--surface);border:1px solid var(--border);
+              border-radius:9px;color:var(--text);font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border .15s}
+.form-control:focus{border-color:var(--violet)}
+.btn-submit{width:100%;padding:12.5px;border-radius:9px;border:none;
+            background:linear-gradient(135deg,var(--violet),var(--violet-dim));color:#fff;font-size:15px;font-weight:700;
+            cursor:pointer;transition:transform .15s;margin-top:6px;font-family:'Inter',sans-serif;
+            box-shadow:0 4px 14px rgba(124,108,245,.25)}
+.btn-submit:hover{transform:translateY(-1px)}
+.auth-footer{text-align:center;font-size:13px;color:var(--muted);margin-top:20px}
+.auth-footer a{color:var(--violet);font-weight:600}
+.error-box{background:rgba(240,86,122,.1);border:1px solid rgba(240,86,122,.25);border-radius:9px;
+           padding:11px 14px;font-size:13px;color:var(--rose);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+<div class="auth-card">
+  <div class="auth-brand">
+    <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18L9 9L14 14L20 5" stroke="#0b1220" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h2>Create your account</h2>
+    <p>Start analysing your data today</p>
+  </div>
+
+  {% if error %}
+  <div class="error-box"><i class="fa fa-circle-exclamation"></i> {{ error }}</div>
+  {% endif %}
+
+  <form method="POST" action="/signup">
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input class="form-control" type="text" name="username" placeholder="e.g. johndoe" required />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-control" type="email" name="email" placeholder="you@example.com" required />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-control" type="password" name="password" placeholder="Min 6 characters" required />
+    </div>
+    <button class="btn-submit" type="submit">Create Account →</button>
+  </form>
+
+  <div class="auth-footer">Already have an account? <a href="/login">Sign in</a></div>
+</div>
+</body>
+</html>

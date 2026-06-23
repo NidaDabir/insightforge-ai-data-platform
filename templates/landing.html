@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>InsightForge — AI-Powered Data Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<style>
+:root{
+  --bg:#0b1220;--surface:#0e1726;--card:#131d33;--border:#1f2b45;
+  --violet:#7c6cf5;--violet-dim:#5b4fd1;--teal:#34d9c5;--amber:#f5a623;--rose:#f0567a;
+  --text:#e7ecf5;--text-dim:#aab4c8;--muted:#6b7894;
+  --font-display:'Sora',sans-serif;--font-body:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+h1,h2,h3{font-family:var(--font-display)}
+body::before{
+  content:'';position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(ellipse 70% 45% at 75% -5%, rgba(124,108,245,.14) 0%, transparent 60%),
+             radial-gradient(ellipse 55% 35% at 5% 100%, rgba(52,217,197,.08) 0%, transparent 60%);
+}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:18px 48px;
+    border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+    background:rgba(11,18,32,.85);backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--violet),var(--teal));display:grid;place-items:center}
+.brand-mark svg{width:17px;height:17px}
+.brand-name{font-family:var(--font-display);font-size:17px;font-weight:700}
+.nav-links{display:flex;align-items:center;gap:26px}
+.nav-links a{font-size:14px;color:var(--text-dim);transition:color .15s}
+.nav-links a:hover{color:var(--text)}
+.btn-nav{padding:9px 20px;border-radius:9px;font-weight:600;font-size:14px;
+         background:linear-gradient(135deg,var(--violet),var(--violet-dim));color:#fff;
+         box-shadow:0 4px 14px rgba(124,108,245,.25);transition:transform .15s}
+.btn-nav:hover{transform:translateY(-1px)}
+.btn-nav-ghost{padding:9px 18px;border-radius:9px;font-weight:600;font-size:14px;border:1px solid var(--border);color:var(--text)}
+.btn-nav-ghost:hover{background:rgba(255,255,255,.04)}
+
+/* HERO */
+.hero{min-height:78vh;display:flex;align-items:center;padding:60px 48px;gap:60px;max-width:1280px;margin:0 auto}
+.hero-left{flex:1;max-width:560px}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;
+              background:rgba(124,108,245,.1);border:1px solid rgba(124,108,245,.25);
+              font-size:11.5px;color:var(--violet);letter-spacing:.5px;font-weight:600;margin-bottom:22px}
+h1{font-size:clamp(34px,5vw,56px);font-weight:800;line-height:1.1;letter-spacing:-1.6px;margin-bottom:20px}
+.grad{background:linear-gradient(100deg,var(--violet) 10%,var(--teal) 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:16.5px;color:var(--text-dim);line-height:1.7;margin-bottom:30px}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:11px;font-size:15.5px;font-weight:700;
+             background:linear-gradient(135deg,var(--violet),var(--violet-dim));color:#fff;
+             box-shadow:0 6px 20px rgba(124,108,245,.3);transition:transform .15s}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-outline{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:11px;font-size:15.5px;font-weight:600;
+             border:1px solid var(--border);color:var(--text);transition:all .15s}
+.btn-outline:hover{background:rgba(255,255,255,.04);transform:translateY(-2px)}
+
+/* SIGNATURE: animated data pipeline visual */
+.hero-right{flex:1;display:flex;justify-content:center}
+.pipeline{width:100%;max-width:420px;position:relative}
+.pipe-stage{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:14px 16px;margin-bottom:0;position:relative;display:flex;align-items:center;gap:12px;
+}
+.pipe-icon{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex-shrink:0;font-size:14px}
+.pipe-label{font-size:12.5px;font-weight:600}
+.pipe-sub{font-size:10.5px;color:var(--muted);font-family:var(--mono);margin-top:1px}
+.pipe-connector{height:26px;width:2px;background:var(--border);margin-left:33px;position:relative;overflow:hidden}
+.pipe-connector::after{
+  content:'';position:absolute;top:-100%;left:0;width:100%;height:50%;
+  background:linear-gradient(180deg,transparent,var(--teal));animation:flowDown 1.8s linear infinite;
+}
+.pipe-connector:nth-of-type(2)::after{animation-delay:.3s}
+.pipe-connector:nth-of-type(4)::after{animation-delay:.6s}
+.pipe-connector:nth-of-type(6)::after{animation-delay:.9s}
+@keyframes flowDown{0%{top:-100%}100%{top:100%}}
+.pipe-badge{position:absolute;top:-10px;right:-10px;background:var(--teal);color:#0b1220;
+            font-size:9px;font-weight:700;padding:3px 8px;border-radius:20px;font-family:var(--mono)}
+
+/* STATS BAR */
+.stats-bar{border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+           padding:26px 48px;display:flex;justify-content:center;gap:64px;background:var(--surface)}
+.stat{text-align:center}
+.stat-n{font-family:var(--font-display);font-size:26px;font-weight:700;
+        background:linear-gradient(135deg,var(--violet),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-l{font-size:11.5px;color:var(--muted);margin-top:4px}
+
+/* FEATURES */
+.section{max-width:1140px;margin:0 auto;padding:88px 24px}
+.section-title{text-align:center;margin-bottom:10px}
+.section-title h2{font-size:34px;font-weight:700;letter-spacing:-1px}
+.section-sub{text-align:center;color:var(--muted);font-size:15.5px;margin-bottom:50px}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:860px){.features-grid{grid-template-columns:1fr}.hero{flex-direction:column;padding:50px 24px}}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px;transition:transform .15s,border-color .15s}
+.feature-card:hover{transform:translateY(-3px);border-color:rgba(124,108,245,.35)}
+.feat-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:17px;margin-bottom:15px}
+.feat-title{font-family:var(--font-display);font-size:15px;font-weight:600;margin-bottom:8px}
+.feat-desc{font-size:13px;color:var(--text-dim);line-height:1.65}
+
+.stack-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:36px}
+.stack-chip{padding:7px 15px;border-radius:9px;font-size:12.5px;font-weight:600;
+            background:var(--card);border:1px solid var(--border);color:var(--text-dim);display:flex;align-items:center;gap:6px}
+
+.api-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px;
+         font-family:var(--mono);font-size:12.5px;color:var(--muted);line-height:2.1}
+
+footer{text-align:center;padding:34px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18L9 9L14 14L20 5" stroke="#0b1220" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="brand-name">InsightForge</div>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#stack">Stack</a>
+    <a href="#api-ref">API</a>
+    <a href="/login" class="btn-nav-ghost">Sign In</a>
+    <a href="/signup" class="btn-nav">Get Started →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">⚡ AI-Powered Data Intelligence Platform</div>
+    <h1>Turn raw data into<br><span class="grad">actionable insight</span></h1>
+    <p class="hero-sub">Upload any CSV or Excel file. InsightForge cleans it, profiles it, trains and compares multiple ML models, and explains every prediction with SHAP — all without writing a line of code.</p>
+    <div class="hero-ctas">
+      <a href="/signup" class="btn-primary"><i class="fa fa-rocket"></i> Launch Platform</a>
+      <a href="/api/v1/status" target="_blank" class="btn-outline"><i class="fa fa-code"></i> Try the API</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="pipeline">
+      <div class="pipe-stage" style="border-color:rgba(124,108,245,.3)">
+        <div class="pipe-badge">STEP 1</div>
+        <div class="pipe-icon" style="background:rgba(124,108,245,.14);color:var(--violet)"><i class="fa fa-file-csv"></i></div>
+        <div><div class="pipe-label">Upload Dataset</div><div class="pipe-sub">sales_data.csv · 14,302 rows</div></div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage">
+        <div class="pipe-icon" style="background:rgba(52,217,197,.14);color:var(--teal)"><i class="fa fa-broom"></i></div>
+        <div><div class="pipe-label">Auto-Clean & Profile</div><div class="pipe-sub">0 missing · 6 numeric · 3 cat</div></div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage" style="border-color:rgba(245,166,35,.3)">
+        <div class="pipe-badge" style="background:var(--amber)">STEP 3</div>
+        <div class="pipe-icon" style="background:rgba(245,166,35,.14);color:var(--amber)"><i class="fa fa-brain"></i></div>
+        <div><div class="pipe-label">Train & Compare Models</div><div class="pipe-sub">GBM · RF · Linear → best: 91.4%</div></div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage">
+        <div class="pipe-icon" style="background:rgba(240,86,122,.14);color:var(--rose)"><i class="fa fa-magnifying-glass-chart"></i></div>
+        <div><div class="pipe-label">Explain with SHAP</div><div class="pipe-sub">feature_3 contributes +0.42</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-n">3</div><div class="stat-l">Models Compared / Run</div></div>
+  <div class="stat"><div class="stat-n">5</div><div class="stat-l">REST Endpoints</div></div>
+  <div class="stat"><div class="stat-n">Auto</div><div class="stat-l">Task Detection</div></div>
+  <div class="stat"><div class="stat-n">SHAP</div><div class="stat-l">Explainable AI</div></div>
+</div>
+
+<section class="section" id="features">
+  <div class="section-title"><h2>Everything you need</h2></div>
+  <p class="section-sub">One platform. Full ML pipeline. Zero boilerplate.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feat-icon" style="background:rgba(124,108,245,.12);color:var(--violet)"><i class="fa fa-upload"></i></div>
+      <div class="feat-title">Smart Data Upload</div>
+      <div class="feat-desc">CSV or Excel, auto-profiled instantly: column types, missing values, descriptive stats, and plain-English insights.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feat-icon" style="background:rgba(52,217,197,.12);color:var(--teal)"><i class="fa fa-layer-group"></i></div>
+      <div class="feat-title">Multi-Model Comparison</div>
+      <div class="feat-desc">Every run trains Gradient Boosting, Random Forest, and a linear baseline — then picks and reports the winner.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feat-icon" style="background:rgba(245,166,35,.12);color:var(--amber)"><i class="fa fa-chart-area"></i></div>
+      <div class="feat-title">Live Visual Dashboard</div>
+      <div class="feat-desc">Correlation heatmaps, distributions, scatter trendlines — generated and streamed in without a page reload.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feat-icon" style="background:rgba(240,86,122,.12);color:var(--rose)"><i class="fa fa-magnifying-glass-chart"></i></div>
+      <div class="feat-title">Explainable AI (SHAP)</div>
+      <div class="feat-desc">See exactly why a prediction happened with SHAP beeswarm plots ranking each feature's contribution.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feat-icon" style="background:rgba(124,108,245,.12);color:#a78bfa"><i class="fa fa-user-shield"></i></div>
+      <div class="feat-title">Secure Workspaces</div>
+      <div class="feat-desc">SHA-256 hashed auth with per-user project history. Every dataset and model run is private to your account.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feat-icon" style="background:rgba(52,217,197,.12);color:var(--teal)"><i class="fa fa-code"></i></div>
+      <div class="feat-title">Production REST API</div>
+      <div class="feat-desc">/api/v1/upload, /train, /predict — build your own data product on top of InsightForge's ML backend.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="stack" style="padding-top:0">
+  <div class="section-title"><h2>Built with the best tools</h2></div>
+  <div class="stack-row">
+    <div class="stack-chip">🐍 Python 3.11</div>
+    <div class="stack-chip">🌶️ Flask</div>
+    <div class="stack-chip">🐼 Pandas</div>
+    <div class="stack-chip">🔢 NumPy</div>
+    <div class="stack-chip">🤖 scikit-learn</div>
+    <div class="stack-chip">📊 Matplotlib + Seaborn</div>
+    <div class="stack-chip">🗄️ SQLite</div>
+    <div class="stack-chip">🔐 SHA-256 Auth</div>
+    <div class="stack-chip">⚡ SHAP (XAI)</div>
+    <div class="stack-chip">📁 Excel Support</div>
+    <div class="stack-chip">🌐 REST API</div>
+    <div class="stack-chip">🚀 Gunicorn</div>
+  </div>
+</section>
+
+<section class="section" id="api-ref" style="padding-top:0">
+  <div class="section-title"><h2>REST API — ready for integration</h2></div>
+  <p class="section-sub">Build your own data products on top of InsightForge</p>
+  <div class="api-box">
+    <span style="color:var(--teal)">GET</span>&nbsp;&nbsp;<span style="color:#fff">/api/v1/status</span><br>
+    <span style="color:var(--amber)">POST</span> <span style="color:#fff">/api/v1/upload</span>&nbsp;&nbsp;<span>— upload CSV, get column profile</span><br>
+    <span style="color:var(--amber)">POST</span> <span style="color:#fff">/api/v1/train</span>&nbsp;&nbsp;&nbsp;<span>— train + compare models, get scores</span><br>
+    <span style="color:var(--amber)">POST</span> <span style="color:#fff">/api/v1/predict</span>&nbsp;<span>— predict on new data rows</span><br>
+    <span style="color:var(--teal)">GET</span>&nbsp;&nbsp;<span style="color:#fff">/api/v1/projects</span>&nbsp;<span>— list your saved projects (auth)</span>
+  </div>
+</section>
+
+<footer>Built with Flask · scikit-learn · Matplotlib · SQLite &nbsp;|&nbsp; InsightForge v2.0</footer>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Project History – InsightForge{% endblock %}
+{% block page_title %}Project History{% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-header">
+    <div class="card-title"><i class="fa fa-clock-rotate-left"></i> All Projects</div>
+    <a href="/dashboard" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> New Project</a>
+  </div>
+
+  {% if projects %}
+  <div class="table-wrap" style="max-height:none">
+    <table>
+      <thead>
+        <tr>
+          <th>Dataset</th>
+          <th>Shape</th>
+          <th>Model Runs</th>
+          <th>Best Score</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for proj in projects %}
+        <tr>
+          <td><div style="font-weight:600;font-size:13px;color:var(--text)">{{ proj.name }}</div></td>
+          <td><span class="mono text-teal">{{ proj.shape }}</span></td>
+          <td><span class="badge badge-violet">{{ proj.run_count }} run{{ 's' if proj.run_count != 1 else '' }}</span></td>
+          <td>
+            {% if proj.best_score %}
+              <span class="mono" style="color:var(--amber)">{{ proj.best_score|round(1) }}%</span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td style="display:flex;gap:8px;flex-wrap:wrap">
+            <a href="/project/{{ proj.id }}" class="btn btn-ghost btn-sm"><i class="fa fa-eye"></i> View</a>
+            <a href="/download/{{ proj.id }}" class="btn btn-ghost btn-sm"><i class="fa fa-download"></i></a>
+            <form action="/project/{{ proj.id }}/delete" method="POST" style="display:inline" onsubmit="return confirm('Delete this project?')">
+              <button class="btn btn-danger btn-sm" type="submit"><i class="fa fa-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:60px;color:var(--muted)">
+    <div style="font-size:40px;margin-bottom:16px">📂</div>
+    <div style="font-size:16px;font-weight:600;margin-bottom:8px;color:var(--text)">No projects yet</div>
+    <div style="font-size:13px;margin-bottom:20px">Upload your first dataset to get started</div>
+    <a href="/dashboard" class="btn btn-primary"><i class="fa fa-upload"></i> Upload Dataset</a>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
