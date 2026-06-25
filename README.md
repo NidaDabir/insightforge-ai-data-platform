@@ -1,13 +1,15 @@
 # ⚡ InsightForge — AI-Powered Data Intelligence Platform
 
-[![Live Demo](https://img.shields.io/badge/demo-live-34d9c5?style=for-the-badge)](https://YOUR-RENDER-URL.onrender.com)
+[![Live Demo](https://img.shields.io/badge/demo-live-34d9c5?style=for-the-badge)](https://insightforge-ai-data-platform.onrender.com)
 [![Docker](https://img.shields.io/badge/containerized-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#-run-with-docker)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](#)
 [![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=for-the-badge&logo=flask&logoColor=white)](#)
 
 > Upload CSV/Excel → Auto-profile with insights → Train & compare 3 ML models live → Explain with SHAP → REST API
 
-**[🚀 Live Demo](https://YOUR-RENDER-URL.onrender.com)** &nbsp;|&nbsp; **[📂 Source](https://github.com/NidaDabir/insightforge-ai-data-platform)**
+**[🚀 Live Demo](https://insightforge-ai-data-platform.onrender.com)** &nbsp;|&nbsp; **[📂 Source](https://github.com/NidaDabir/insightforge-ai-data-platform)**
+
+> ⏳ Hosted on Render's free tier — the app spins down after inactivity, so the first load can take 30-50 seconds to wake up. Totally normal, just give it a moment.
 
 ---
 
